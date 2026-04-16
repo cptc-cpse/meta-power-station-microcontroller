@@ -6,7 +6,7 @@ import paho.mqtt.client as mqtt
 
 def build_current_payload(current_value: Any) -> str:
     """Build a compact JSON payload containing the current measurement.
-
+    TODO: build a payload that matches the expected format for the MQTT topic subscribers.
     Args:
         current_value: The current measurement value to include in the payload.
 

@@ -51,4 +51,14 @@ Run the app with:
 python -m app.app
 ```
 
+## Running unit tests
+
+Run all unit tests in the repository with pytest from the project root:
+
+```bash
+python -m pytest
+```
+
+If you are running on Windows PowerShell, use the same virtual environment activation commands from the quickstart section before executing tests.
+
 
