@@ -10,6 +10,8 @@ This module serves as the main entry point for the application, orchestrating th
 with the Shelly device and the MQTT publishing of current measurements.
 """
 
+POLLING_INTERVAL_SECONDS : int = 10
+
 # TODO: set these values when the broker and topics are ready
 BROKER = "mqtt.example.com"
 PORT = 1883
@@ -71,7 +73,7 @@ async def main() -> None:
 
     # Use a callback when MQTT publishing is enabled.
     # await shelly_poll.poll_forever(callback=publish_status)
-    await shelly_poll.poll_forever()
+    await shelly_poll.poll_forever(interval=POLLING_INTERVAL_SECONDS)
 
 
 if __name__ == "__main__":
