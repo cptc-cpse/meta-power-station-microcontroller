@@ -13,6 +13,10 @@ from app.shelley.rpc import (
     parse_rpc_response,
 )
 
+"""
+This module defines the polling logic for continuously fetching status from a Shelly device
+"""
+
 ADDRESS = "30:30:F9:EB:DC:EE"
 
 

@@ -4,9 +4,13 @@ from typing import Any, Optional
 from app.shelley import poll as shelly_poll
 from app.mqtt import publisher as mqtt_publisher
 
+
 """
-TODO: set these values when the broker and topics are ready
+This module serves as the main entry point for the application, orchestrating the BLE communication
+with the Shelly device and the MQTT publishing of current measurements.
 """
+
+# TODO: set these values when the broker and topics are ready
 BROKER = "mqtt.example.com"
 PORT = 1883
 TOPIC = "shelly/current"
@@ -42,7 +46,8 @@ def extract_current(status_response: Any) -> Optional[Any]:
 
 
 async def publish_status(status: Any) -> None:
-    """Publish the current value extracted from a Shelly status response.
+    """
+    Publish the current value extracted from a Shelly status response.
 
     Args:
         status: Shelly status response payload to inspect for current value.

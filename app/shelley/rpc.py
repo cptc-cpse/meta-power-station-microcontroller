@@ -2,13 +2,21 @@ import json
 import struct
 from typing import Any, Dict
 
+"""
+This module defines the RPC communication logic for interacting with Shelly devices over BLE,
+"""
+
+
+# RPC characteristic UUIDs for Shelly BLE communication.
+# https://kb.shelly.cloud/knowledge-base/kbsa-communicating-with-shelly-devices-via-bluetoo
 RPC_CHAR_DATA_UUID = "5f6d4f53-5f52-5043-5f64-6174615f5f5f"
 RPC_CHAR_TX_CTL_UUID = "5f6d4f53-5f52-5043-5f74-785f63746c5f"
 RPC_CHAR_RX_CTL_UUID = "5f6d4f53-5f52-5043-5f72-785f63746c5f"
 
 
 def build_rpc_payload(method: str, params: Dict[str, Any] | None = None, request_id: int = 1) -> bytes:
-    """Build the BLE RPC payload for a Shelly device request.
+    """
+    Build the BLE RPC payload for a Shelly device request.
 
     Args:
         method: The RPC method name to invoke.
@@ -28,7 +36,8 @@ def build_rpc_payload(method: str, params: Dict[str, Any] | None = None, request
 
 
 def parse_rpc_response(raw_bytes: bytes) -> Dict[str, Any]:
-    """Parse a raw BLE RPC response payload into a Python dictionary.
+    """
+    Parse a raw BLE RPC response payload into a Python dictionary.
 
     Args:
         raw_bytes: The raw bytes returned by the BLE RPC response.
@@ -40,7 +49,8 @@ def parse_rpc_response(raw_bytes: bytes) -> Dict[str, Any]:
 
 
 def pack_length_header(payload: bytes) -> bytes:
-    """Pack the length of the payload as a 4-byte big-endian header.
+    """
+    Pack the length of the payload as a 4-byte big-endian header.
 
     Args:
         payload: The payload bytes to prefix with a length header.
