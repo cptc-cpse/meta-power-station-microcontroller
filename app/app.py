@@ -13,9 +13,9 @@ with the Shelly device and the MQTT publishing of current measurements.
 POLLING_INTERVAL_SECONDS : int = 10
 
 # TODO: set these values when the broker and topics are ready
-BROKER = "mqtt.example.com"
+BROKER = "http://192.168.1.115/"
 PORT = 1883
-TOPIC = "shelly/current"
+TOPIC = "clover_park/building_24/meta_power_station/station_alpha/current"
 
 
 def extract_current(status_response: Any) -> Optional[Any]:
