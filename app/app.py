@@ -13,9 +13,11 @@ with the Shelly device and the MQTT publishing of current measurements.
 POLLING_INTERVAL_SECONDS : int = 10
 
 # TODO: set these values when the broker and topics are ready
-BROKER = "mqtt.example.com"
+BROKER = "192.168.0.64"
 PORT = 1883
-TOPIC = "shelly/current"
+TOPIC = "clover_park/building_24/meta_power_station/station_alpha/current"
+
+TEST_MODE = True  # Set to True to test MQTT publishing without Bluetooth polling
 
 
 def extract_current(status_response: Any) -> Optional[Any]:
@@ -69,11 +71,19 @@ async def publish_status(status: Any) -> None:
 
 async def main() -> None:
     """Set up the Shelly device and begin polling its status indefinitely."""
-    await shelly_poll.setup_device()
-
-    # Use a callback when MQTT publishing is enabled.
-    # await shelly_poll.poll_forever(callback=publish_status)
-    await shelly_poll.poll_forever(interval=POLLING_INTERVAL_SECONDS)
+    if TEST_MODE:
+        # Test mode: periodically publish a test payload to MQTT without Bluetooth polling
+        print("Running in TEST_MODE: Publishing test payload every", POLLING_INTERVAL_SECONDS, "seconds")
+        while True:
+            test_current = 5.0  # Example test current value
+            payload = mqtt_publisher.build_current_payload(test_current)
+            mqtt_publisher.publish(TOPIC, payload, BROKER, PORT)
+            print(f"Test published to {TOPIC}: {payload}")
+            await asyncio.sleep(POLLING_INTERVAL_SECONDS)
+    else:
+        # Normal mode: Poll Shelly device and publish status
+        await shelly_poll.setup_device()
+        await shelly_poll.poll_forever(interval=POLLING_INTERVAL_SECONDS, callback=publish_status)
 
 
 if __name__ == "__main__":
