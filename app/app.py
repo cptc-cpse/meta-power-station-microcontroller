@@ -13,11 +13,11 @@ with the Shelly device and the MQTT publishing of current measurements.
 POLLING_INTERVAL_SECONDS : int = 10
 
 # TODO: set these values when the broker and topics are ready
-BROKER = "192.168.0.64"
+BROKER = "192.168.1.115"
 PORT = 1883
 TOPIC = "clover_park/building_24/meta_power_station/station_alpha/current"
 
-TEST_MODE = True  # Set to True to test MQTT publishing without Bluetooth polling
+TEST_MODE = False  # Set to True to test MQTT publishing without Bluetooth polling
 
 
 def extract_current(status_response: Any) -> Optional[Any]:
