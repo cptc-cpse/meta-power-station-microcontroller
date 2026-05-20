@@ -6,6 +6,9 @@ CONFIG_PATH: str
 @dataclass
 class Config:
     """App configuration data class."""
+    """Default values are currently being set for all fields for convenience, 
+    but in the future values like the shelley_address and station_id should require 
+    user specification during configuration creation as they should differ between each station."""
 
     #The identifer for the power station, used in MQTT topic construction
     station_id: str = "station_alpha" 
