@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 #Filepath to the configuration file
 CONFIG_PATH: str
@@ -22,7 +22,7 @@ class Config:
     #The BLE address of the Shelley device
     shelley_address: str = "30:30:F9:EB:DC:EE"
     #The types of readings to extract from the Shelly status response, mapped to their units
-    reading_types: dict[str, str] = {"current": "amps", "power": "watts", "voltage": "volts"}
+    reading_types: dict[str, str] =  field(default_factory=lambda: {"current": "amps", "power": "watts", "voltage": "volts"})
     #The interval in seconds between each loop of polling the Shelly device and publishing to MQTT
     sleep_interval_seconds: int = 10
     #The version of the configuration schema, used for validating and migrating configurations
