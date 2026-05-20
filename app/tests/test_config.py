@@ -1,3 +1,4 @@
+from app.configuration import config as app_config
 from app.configuration.config import Config
 
 def test_config_has_expected_defaults():
@@ -17,3 +18,15 @@ def test_config_has_expected_defaults():
     }
     assert config.sleep_interval_seconds == 10
     assert config.CONFIG_VERSION == 1
+
+def test_get_config_returns_config_object():
+    config = app_config.get_config()
+    assert isinstance(config, Config)
+
+def test_create_config_returns_config_object():
+    config = app_config.create_config()
+    assert isinstance(config, Config)
+
+def test_is_valid_config_returns_boolean():
+    valid = app_config.is_valid_config()
+    assert isinstance(valid, bool)
