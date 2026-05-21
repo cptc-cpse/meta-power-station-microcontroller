@@ -36,12 +36,12 @@ class Publisher:
             None: The client publishes the message and then disconnects.
         """
         client = mqtt.Client()
+        client.will_set(self.LAST_WILL_TOPIC, self.LAST_WILL_MESSAGE, qos=self.QOS, retain=self.RETAIN)
         try: 
             client.connect(self.BROKER, self.PORT, 60)
         except Exception as e:
             logger.error(f"Error connecting to MQTT broker: {e}")
         else: 
-            client.will_set(self.LAST_WILL_TOPIC, self.LAST_WILL_MESSAGE, qos=self.QOS, retain=self.RETAIN)
             result = client.publish(topic, payload, qos=self.QOS, retain=self.RETAIN)
             result.wait_for_publish(3)  # Wait for the publish to complete
             if result.rc != mqtt.MQTT_ERR_SUCCESS:

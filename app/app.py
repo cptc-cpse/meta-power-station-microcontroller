@@ -5,7 +5,6 @@ from app.shelley import poll as shelly_poll
 from app.mqtt import publisher as mqtt_publisher
 from app.configuration import config as app_config
 
-
 """
 This module serves as the main entry point for the application, orchestrating the BLE communication
 with the Shelly device and the MQTT publishing of current measurements.
@@ -16,7 +15,7 @@ POLLING_INTERVAL_SECONDS : int = 10
 # TODO: set these values when the broker and topics are ready
 TOPIC = "clover_park/building_24/meta_power_station/station_alpha/current"
 
-TEST_MODE = True  # Set to True to test MQTT publishing without Bluetooth polling
+TEST_MODE = False  # Set to True to test MQTT publishing without Bluetooth polling
 
 publisher : mqtt_publisher.Publisher 
 
