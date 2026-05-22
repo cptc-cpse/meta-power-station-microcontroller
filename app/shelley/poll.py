@@ -18,7 +18,7 @@ from app.shelley.rpc import (
 
 #ADDRESS = "30:30:F9:EB:DC:EE"
 
-class Poll:
+class Poller:
     """
     This class defines the polling logic for continuously fetching status from a Shelly device
     """
@@ -27,7 +27,7 @@ class Poll:
         self.ADDRESS: str = config.shelley_address
         self.POLL_COUNT: int = 5
 
-    async def send_rpc(client: BleakClient, method: str, params: Optional[Dict[str, Any]] = None, request_id: int = 1) -> Dict[str, Any]:
+    async def send_rpc(self, client: BleakClient, method: str, params: Optional[Dict[str, Any]] = None, request_id: int = 1) -> Dict[str, Any]:
         """Send a single RPC request to the Shelly device over BLE.
 
         Args:
@@ -66,6 +66,7 @@ class Poll:
         return parse_rpc_response(bytes(buffer[:rx_len]))
 
     async def call(
+        self,
         address: str,
         method: str,
         params: Optional[Dict[str, Any]] = None,
@@ -90,7 +91,7 @@ class Poll:
                 async with BleakClient(address, timeout=20.0) as client:
                     print(f"Connected for {method}: {client.is_connected}")
                     await asyncio.sleep(1.0)
-                    response = await send_rpc(client, method, params, request_id + attempt - 1)
+                    response = await self.send_rpc(client, method, params, request_id + attempt - 1)
                     print(json.dumps(response, indent=2))
                     return response
             except Exception as exc:
@@ -111,16 +112,16 @@ class Poll:
         Returns:
             The Shelly status response dictionary.
         """
-        return await call(self.ADDRESS, "Switch.GetStatus", {"id": 0}, 400, retries=retries)
+        return await self.call(self.ADDRESS, "Switch.GetStatus", {"id": 0}, 400, retries=retries)
 
 
     async def setup_device(self) -> None:
         """Configure the Shelly device and ensure the relay is set on."""
         print("\n--- current config ---")
-        await call(self.ADDRESS, "Switch.GetConfig", {"id": 0}, 100)
+        await self.call(self.ADDRESS, "Switch.GetConfig", {"id": 0}, 100)
 
         print("\n--- set config to detached ---")
-        await call(
+        await self.call(
             self.ADDRESS,
             "Switch.SetConfig",
             {
@@ -136,7 +137,7 @@ class Poll:
         await asyncio.sleep(8)
 
         print("\n--- turn relay on ---")
-        await call(self.ADDRESS, "Switch.Set", {"id": 0, "on": True}, 300)
+        await self.call(self.ADDRESS, "Switch.Set", {"id": 0, "on": True}, 300)
 
         await asyncio.sleep(8)
 
@@ -160,7 +161,7 @@ class Poll:
         while True:
             poll_count += 1
             print(f"\nPoll {poll_count}:")
-            status = await call(self.ADDRESS, "Switch.GetStatus", {"id": 0}, 400)
+            status = await self.call(self.ADDRESS, "Switch.GetStatus", {"id": 0}, 400)
             if callback:
                 await callback(status)
             await asyncio.sleep(self.POLL_COUNT)
