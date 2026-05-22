@@ -25,7 +25,7 @@ class Poller:
 
     def __init__(self, config: config.Config):
         self.ADDRESS: str = config.shelley_address
-        self.POLL_COUNT: int = 5
+        self.POLL_COUNT: int = 0
 
     async def send_rpc(self, client: BleakClient, method: str, params: Optional[Dict[str, Any]] = None, request_id: int = 1) -> Dict[str, Any]:
         """Send a single RPC request to the Shelly device over BLE.
@@ -144,6 +144,7 @@ class Poller:
 
     async def poll_forever(
         self,
+        interval: int = 5,
         callback: Optional[Callable[[Dict[str, Any]], Awaitable[None]]] = None,
     ) -> None:
         """Continuously poll Shelly status and optionally invoke a callback.
@@ -157,11 +158,10 @@ class Poller:
             None: Runs indefinitely unless cancelled.
         """
         print("\n--- read status (polling every 5 seconds indefinitely) ---")
-        poll_count = 0
         while True:
             poll_count += 1
             print(f"\nPoll {poll_count}:")
             status = await self.call(self.ADDRESS, "Switch.GetStatus", {"id": 0}, 400)
             if callback:
                 await callback(status)
-            await asyncio.sleep(self.POLL_COUNT)
+            await asyncio.sleep(interval)
