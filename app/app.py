@@ -4,7 +4,6 @@ from typing import Any, Optional
 from app.shelley import poll as shelly_poll
 from app.mqtt import publisher as mqtt_publisher
 from app.configuration import config as app_config
-from app.models.power_reading import powerReading
 
 """
 This module serves as the main entry point for the application, orchestrating the BLE communication
@@ -19,15 +18,6 @@ TOPIC = "clover_park/building_24/meta_power_station/station_alpha/current"
 TEST_MODE = False  # Set to True to test MQTT publishing without Bluetooth polling
 
 publisher : mqtt_publisher.Publisher 
-
-# Initialized power reading object wih NULL values to be written over once actual data is captured.
-reading = powerReading(
-    station_id= None,
-    building_id= None,
-    reading_type= None,
-    value= None,
-    unit= None
-)
 
 def extract_current(status_response: Any) -> Optional[Any]:
     """Extract the current measurement from a Shelly status response.
