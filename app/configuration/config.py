@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
+import json
+import logging
 
 #Filepath to the configuration file
-CONFIG_PATH: str
+CONFIG_PATH: str = "app/configuration/config.json"
 
 @dataclass
 class Config:
@@ -33,6 +35,22 @@ class Config:
     #configuration structure to trigger re-creation of the config file
     CONFIG_VERSION: int = 1
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "Config":
+        """Create a Config instance from a dictionary, ignoring any extra fields."""
+        return cls(
+            station_id=data["station_id"],
+            building_id=data["building_id"],
+            mqtt_broker_address=data["mqtt_broker_address"],
+            mqtt_broker_port=data["mqtt_broker_port"],
+            mqtt_qos=data["mqtt_qos"],
+            mqtt_retain=data["mqtt_retain"],
+            shelley_address=data["shelley_address"],
+            reading_types=data["reading_types"],
+            sleep_interval_seconds=data["sleep_interval_seconds"],
+            CONFIG_VERSION=data.get("CONFIG_VERSION", 1)
+        )
+
 def get_config() -> Config:
     """Retrieves the application configuration.
     Attempts to load from a file, but if no valid configuration is found, 
@@ -41,7 +59,16 @@ def get_config() -> Config:
     Returns:
         Config: The application configuration object.
     """
-    return Config()
+    config = None
+    if is_valid_config():
+        with open(CONFIG_PATH, "r") as f:
+            config_data = json.load(f)
+            config = Config.from_dict(config_data)
+            #print(config_data)
+    else:
+        logging.warning("No valid configuration found. Creating new configuration.")
+        config = create_config()
+    return config
 
 def create_config() -> Config:
     """Creates a new configuration by prompting the user for input.
@@ -51,6 +78,12 @@ def create_config() -> Config:
     Returns:
         Config: The newly created configuration object based on user input.
     """
+    config = Config()
+
+    json_string = json.dumps(config.__dict__, indent=4)
+    with open(CONFIG_PATH, "w") as f:
+        f.write(json_string)
+
     return Config()
 
 def is_valid_config() -> bool:
@@ -61,4 +94,12 @@ def is_valid_config() -> bool:
     Returns:
         bool: True if the configuration file exists and is valid, False otherwise.
     """
-    return True
+    try:
+        with open(CONFIG_PATH, "r") as f:
+            config_data = json.load(f)
+            config = Config.from_dict(config_data)
+            return True
+    except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+        logging.error(f"Configuration file error: {e}")
+        return False
+    
