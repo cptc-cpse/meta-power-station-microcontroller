@@ -97,78 +97,28 @@ def create_config() -> Config:
     print("Please enter the following configuration values. Press Enter to use the default value shown in parentheses, when applicable.")
 
     prompt = "Station ID (no default, format: 'station_<name>'): "
-    user_input = input(prompt).strip().lower()
-    while not is_valid_station_id(user_input):
-        print("Invalid station ID. Please enter a valid station ID.")
-        user_input = input(prompt).strip().lower()
-    config.station_id = user_input
+    config.station_id = get_valid_user_input(prompt, is_valid_station_id)
         
     prompt = f"Building ID (default: {config.building_id}): "
-    user_input = input(prompt).strip().lower()  
-    while not is_valid_building_id(user_input):
-        if user_input == "":
-            user_input = config.building_id  # Use default if input is empty
-            break
-        print("Invalid building ID. Please enter a valid building ID or press Enter to use the default.")
-        user_input = input(prompt).strip().lower()
-    config.building_id = user_input
+    config.building_id = get_valid_user_input(prompt, is_valid_building_id, default=config.building_id)
 
     prompt = f"MQTT Broker Address (default: {config.mqtt_broker_address}): "
-    user_input = input(prompt).strip()
-    while not is_valid_mqtt_broker_address(user_input):
-        if user_input == "":
-            user_input = config.mqtt_broker_address  # Use default if input is empty
-            break
-        print("Invalid MQTT broker address. Please enter a valid address or press Enter to use the default.")
-        user_input = input(prompt).strip()
-    config.mqtt_broker_address = user_input
+    config.mqtt_broker_address = get_valid_user_input(prompt, is_valid_mqtt_broker_address, default=config.mqtt_broker_address)
 
     prompt = f"MQTT Broker Port (default: {config.mqtt_broker_port}): "
-    user_input = input(prompt).strip()
-    while not is_valid_mqtt_broker_port(user_input):
-        if user_input == "":
-            user_input = str(config.mqtt_broker_port)  # Use default if input is empty
-            break
-        print("Invalid MQTT broker port. Please enter a valid port number or press Enter to use the default.")
-        user_input = input(prompt).strip()
-    config.mqtt_broker_port = int(user_input)
+    config.mqtt_broker_port = int(get_valid_user_input(prompt, is_valid_mqtt_broker_port, default=str(config.mqtt_broker_port)))
 
     prompt = f"MQTT QoS Level (0, 1, or 2; default: {config.mqtt_qos}): "
-    user_input = input(prompt).strip()
-    while not is_valid_mqtt_qos(user_input):
-        if user_input == "":
-            user_input = str(config.mqtt_qos)  # Use default if input is empty
-            break
-        print("Invalid MQTT QoS level. Please enter 0, 1, or 2, or press Enter to use the default.")
-        user_input = input(prompt).strip()
-    config.mqtt_qos = int(user_input)
+    config.mqtt_qos = int(get_valid_user_input(prompt, is_valid_mqtt_qos, default=str(config.mqtt_qos)))
 
     prompt = f"MQTT Retain Flag (true or false; default: {config.mqtt_retain}): "
-    user_input = input(prompt).strip()
-    while not is_valid_mqtt_retain(user_input):
-        if user_input == "":
-            user_input = str(config.mqtt_retain)  # Use default if input is empty
-            break
-        print("Invalid MQTT retain flag. Please enter true or false, or press Enter to use the default.")
-        user_input = input(prompt).strip()
-    config.mqtt_retain = user_input.lower() == "true"
+    config.mqtt_retain = get_valid_user_input(prompt, is_valid_mqtt_retain, default=str(config.mqtt_retain)).lower() == "true"
 
     prompt = f"Shelley Device Address (no default, Bluetooth MAC Address, example: {config.shelley_address}): "
-    user_input = input(prompt).strip()
-    while not is_valid_shelley_address(user_input):
-        print("Invalid Shelley device address. Please enter a valid Bluetooth MAC address.")
-        user_input = input(prompt).strip()
-    config.shelley_address = user_input.strip()
+    config.shelley_address = get_valid_user_input(prompt, is_valid_shelley_address)
 
     prompt = f"Sleep Interval Seconds (default: {config.sleep_interval_seconds}): "
-    user_input = input(prompt).strip()
-    while not is_valid_sleep_interval(user_input):
-        if user_input == "":
-            user_input = str(config.sleep_interval_seconds)  # Use default if input is empty
-            break
-        print("Invalid sleep interval. Please enter an integer value greater than or equal to 1, or press Enter to use the default.")
-        user_input = input(prompt).strip()
-    config.sleep_interval_seconds = int(user_input)
+    config.sleep_interval_seconds = int(get_valid_user_input(prompt, is_valid_sleep_interval, default=str(config.sleep_interval_seconds)))
 
     user_input = -1
     print("For reading types, you will select which of the following readings types you want to use. If you select a reading type that is already selected, it will be removed. Press Enter without typing anything to finish selecting.")
@@ -232,6 +182,25 @@ def is_valid_config() -> bool:
     except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
         logging.error(f"Configuration file error: {e}")
         return False
+    
+def get_valid_user_input(prompt: str, validation_func, default: str | None = None) -> str:
+    """Helper function to get valid user input based on a validation function.
+
+    Args:
+        prompt: The input prompt to display to the user.
+        validation_func: A function that takes a string input and returns True if it's valid, False otherwise.
+        default: The default value to return if the user doesn't provide any input.
+
+    Returns:
+        A valid user input string that passes the validation function.
+    """
+    while True:
+        user_input = input(prompt).strip()
+        if validation_func(user_input):
+            return user_input
+        elif default is not None and user_input == "":
+            return default
+        print("Invalid input. Please try again.")
     
 def is_valid_station_id(station_id: str) -> bool:
     """Validates the station ID input by the user. 
