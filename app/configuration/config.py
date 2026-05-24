@@ -170,9 +170,20 @@ def create_config() -> Config:
         user_input = input(prompt).strip()
     config.sleep_interval_seconds = int(user_input)
 
-    #TODO: Add prompts for reading types
-    #Reading types are more complicated, so I'll handle it later
-    print (f"Using default reading types: {config.reading_types}.")
+    user_input = -1
+    print("For reading types, you will select which of the following readings types you want to use. If you select a reading type that is already selected, it will be removed. Press Enter without typing anything to finish selecting.")
+    while user_input or not config.reading_types: 
+        prompt = f"Currently selected reading types: {list(config.reading_types.keys())}. \nEnter a reading type to add or remove (options: {list(VALID_READING_TYPES.keys())}): "
+        user_input = input(prompt).strip()
+        if user_input in VALID_READING_TYPES.keys():
+            if user_input in config.reading_types:
+                del config.reading_types[user_input]
+            else:
+                config.reading_types[user_input] = VALID_READING_TYPES[user_input]
+        elif user_input: 
+            print("Invalid reading type. Please enter one of the valid options, or press Enter to finish selecting.")
+        elif not config.reading_types:
+            print("You must select at least one reading type. Please enter one of the valid options.")
 
     #config version is not set by the user
 
@@ -344,28 +355,8 @@ def is_valid_reading_types(reading_types: dict) -> bool:
     if not reading_types:
         return False
     for key, value in reading_types.items():
-        if not is_valid_reading_type(key, value):
+        if key not in VALID_READING_TYPES or value != VALID_READING_TYPES[key]:
             return False
-    return True
-
-def is_valid_reading_type(reading_type: str, reading_units: str) -> bool:
-    """Validates a single reading type and its corresponding units. 
-    A valid reading type is a string that can be polled from the 
-    Shelly status response (like "current", "power", "voltage") and 
-    a valid reading unit is the corresponding unit of the reading type.
-
-    Args:
-        reading_type: The reading type string to validate.
-        reading_units: The reading units string to validate.
-    
-    Returns:
-        bool: True if the reading type and units are valid, False otherwise.
-    """
-    
-    if reading_type not in VALID_READING_TYPES:
-        return False
-    if reading_units != VALID_READING_TYPES[reading_type]:
-        return False
     return True
 
 def is_valid_sleep_interval(interval: str) -> bool:
