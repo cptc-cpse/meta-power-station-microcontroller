@@ -17,6 +17,8 @@ TOPIC = "clover_park/building_24/meta_power_station/station_alpha/current"
 
 TEST_MODE = False  # Set to True to test MQTT publishing without Bluetooth polling
 
+TEST_POLL_MODE = True
+
 publisher : mqtt_publisher.Publisher 
 
 def extract_current(status_response: Any) -> Optional[Any]:
@@ -82,9 +84,15 @@ async def main() -> None:
             print(f"Test published to {TOPIC}: {payload}")
             await asyncio.sleep(POLLING_INTERVAL_SECONDS)
     else:
-        # Normal mode: Poll Shelly device and publish status
-        await shelly_poll.setup_device()
-        await shelly_poll.poll_forever(interval=POLLING_INTERVAL_SECONDS, callback=publish_status)
+        if TEST_POLL_MODE:
+            poller = shelly_poll.Poller(app_config.create_config())
+            await poller.start()
+            
+        
+        else:
+            # Normal mode: Poll Shelly device and publish status
+            await shelly_poll.setup_device()
+            await shelly_poll.poll_forever(interval=POLLING_INTERVAL_SECONDS, callback=publish_status)
 
 
 if __name__ == "__main__":
