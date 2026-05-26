@@ -4,6 +4,7 @@ import logging
 
 #Filepath to the configuration file
 CONFIG_PATH: str = "app/configuration/config.json"
+CURRENT_CONFIG_VERSION: int = 1
 
 """
 There are other things we could pull from the status, 
@@ -48,7 +49,7 @@ class Config:
     #The version of the configuration schema, used for validating and migrating configurations
     #Not set by the user, we will increment this when we make breaking changes to the 
     #configuration structure to trigger re-creation of the config file
-    CONFIG_VERSION: int = 1
+    CONFIG_VERSION: int = CURRENT_CONFIG_VERSION
 
     @classmethod
     def from_dict(cls, data: dict) -> "Config":
@@ -63,7 +64,7 @@ class Config:
             shelley_address=data["shelley_address"],
             reading_types=data["reading_types"],
             sleep_interval_seconds=data["sleep_interval_seconds"],
-            CONFIG_VERSION=data.get("CONFIG_VERSION", 1)
+            CONFIG_VERSION=data["CONFIG_VERSION"]
         )
 
 def get_config() -> Config:
@@ -100,30 +101,33 @@ def create_config() -> Config:
     config.station_id = get_valid_user_input(prompt, is_valid_station_id)
         
     prompt = f"Building ID (default: {config.building_id}): "
-    config.building_id = get_valid_user_input(prompt, is_valid_building_id, default=config.building_id)
+    config.building_id = get_valid_user_input(prompt, is_valid_building_id, config.building_id)
 
     prompt = f"MQTT Broker Address (default: {config.mqtt_broker_address}): "
-    config.mqtt_broker_address = get_valid_user_input(prompt, is_valid_mqtt_broker_address, default=config.mqtt_broker_address)
+    config.mqtt_broker_address = get_valid_user_input(prompt, is_valid_mqtt_broker_address, config.mqtt_broker_address)
 
     prompt = f"MQTT Broker Port (default: {config.mqtt_broker_port}): "
-    config.mqtt_broker_port = int(get_valid_user_input(prompt, is_valid_mqtt_broker_port, default=str(config.mqtt_broker_port)))
+    config.mqtt_broker_port = int(get_valid_user_input(prompt, is_valid_mqtt_broker_port, str(config.mqtt_broker_port)))
 
     prompt = f"MQTT QoS Level (0, 1, or 2; default: {config.mqtt_qos}): "
-    config.mqtt_qos = int(get_valid_user_input(prompt, is_valid_mqtt_qos, default=str(config.mqtt_qos)))
+    config.mqtt_qos = int(get_valid_user_input(prompt, is_valid_mqtt_qos, str(config.mqtt_qos)))
 
     prompt = f"MQTT Retain Flag (true or false; default: {config.mqtt_retain}): "
-    config.mqtt_retain = get_valid_user_input(prompt, is_valid_mqtt_retain, default=str(config.mqtt_retain)).lower() == "true"
+    config.mqtt_retain = get_valid_user_input(prompt, is_valid_mqtt_retain, str(config.mqtt_retain)).lower() == "true"
 
     prompt = f"Shelley Device Address (no default, Bluetooth MAC Address, example: {config.shelley_address}): "
     config.shelley_address = get_valid_user_input(prompt, is_valid_shelley_address)
 
     prompt = f"Sleep Interval Seconds (default: {config.sleep_interval_seconds}): "
-    config.sleep_interval_seconds = int(get_valid_user_input(prompt, is_valid_sleep_interval, default=str(config.sleep_interval_seconds)))
+    config.sleep_interval_seconds = int(get_valid_user_input(prompt, is_valid_sleep_interval, str(config.sleep_interval_seconds)))
 
     user_input = -1
-    print("For reading types, you will select which of the following readings types you want to use. If you select a reading type that is already selected, it will be removed. Press Enter without typing anything to finish selecting.")
+    print("""For reading types, you will select which of the following readings types you want to use.
+            If you select a reading type that is already selected, it will be removed. 
+            Press Enter without typing anything to finish selecting.""")
     while user_input or not config.reading_types: 
-        prompt = f"Currently selected reading types: {list(config.reading_types.keys())}. \nEnter a reading type to add or remove (options: {list(VALID_READING_TYPES.keys())}): "
+        prompt = f"""Currently selected reading types: {list(config.reading_types.keys())}. 
+        Enter a reading type to add or remove (options: {list(VALID_READING_TYPES.keys())}): """
         user_input = input(prompt).strip()
         if user_input in VALID_READING_TYPES.keys():
             if user_input in config.reading_types:
@@ -157,27 +161,18 @@ def is_valid_config() -> bool:
             config_data = json.load(f)
             config = Config.from_dict(config_data)
 
-            if not is_valid_station_id(config.station_id):
+            if (not is_valid_station_id(config.station_id)
+                or not is_valid_building_id(config.building_id) 
+                or not is_valid_mqtt_broker_address(config.mqtt_broker_address)
+                or not is_valid_mqtt_broker_port(str(config.mqtt_broker_port)) 
+                or not is_valid_mqtt_qos(str(config.mqtt_qos)) 
+                or not is_valid_mqtt_retain(str(config.mqtt_retain)) 
+                or not is_valid_shelley_address(config.shelley_address) 
+                or not is_valid_reading_types(config.reading_types) 
+                or not is_valid_sleep_interval(str(config.sleep_interval_seconds)) 
+                or not is_valid_config_version(str(config.CONFIG_VERSION))):
                 return False
-            if not is_valid_building_id(config.building_id):
-                return False
-            if not is_valid_mqtt_broker_address(config.mqtt_broker_address):
-                return False
-            if not is_valid_mqtt_broker_port(str(config.mqtt_broker_port)):
-                return False
-            if not is_valid_mqtt_qos(str(config.mqtt_qos)):
-                return False
-            if not is_valid_mqtt_retain(str(config.mqtt_retain)):
-                return False
-            if not is_valid_shelley_address(config.shelley_address):
-                return False
-            if not is_valid_reading_types(config.reading_types):
-                return False
-            if not is_valid_sleep_interval(str(config.sleep_interval_seconds)):
-                return False
-            if not is_valid_config_version(str(config.CONFIG_VERSION)):
-                return False
-
+            
             return True
     except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
         logging.error(f"Configuration file error: {e}")
@@ -352,6 +347,6 @@ def is_valid_config_version(version: str) -> bool:
     Returns:
         bool: True if the configuration version is valid, False otherwise.
     """
-    if version.isdigit() and int(version) >= 1:
+    if version.isdigit() and int(version) == CURRENT_CONFIG_VERSION:
         return True
     return False
