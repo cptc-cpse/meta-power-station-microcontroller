@@ -33,7 +33,7 @@ def test_build_payload_happy_path(publication_service):
 
     # Verify the values match the input
     assert payload_dict["station_id"] == "station_alpha"
-    # assert payload_dict["building_id"] == "building_24"
-    # assert payload_dict["reading_type"] == "current"
-    # assert payload_dict["value"] == 15.5
-    # assert payload_dict["unit"] == "amps"
+    assert payload_dict["building_id"] == "building_24"
+    assert payload_dict["reading_type"] == "current"
+    assert payload_dict["value"] == 15.5
+    assert payload_dict["unit"] == "amps"
