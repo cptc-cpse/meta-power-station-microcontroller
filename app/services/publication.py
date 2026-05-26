@@ -2,6 +2,7 @@ import json
 
 from app.configuration.config import Config
 from app.models.power_reading import PowerReading
+from app.mqtt.publisher import Publisher  
 
 
 class PublicationService:
@@ -10,7 +11,7 @@ class PublicationService:
     
     """
     def __init__(self, config: Config):
-        self.config = config
+        self.publisher = Publisher(config)
 
     def build_payload(self, reading: PowerReading) -> str:
         """
@@ -31,3 +32,37 @@ class PublicationService:
             "unit": reading.unit
         }
         return json.dumps(payload)
+    
+    def build_topic(self, reading: PowerReading) -> str:
+        """
+        Builds the MQTT topic string based on the power reading information.
+
+        Params:
+            reading(Reading): One power reading component
+        
+        Returns:
+            A string representing the MQTT topic to which to publish.
+        """
+        return f"clover_park/{reading.building_id}/power_station/{reading.station_id}/{reading.reading_type}"
+    
+    def publish_reading(self, reading: PowerReading):
+        """
+        Publishes a power reading to MQTT by building the topic and payload, 
+        then using the Publisher to send the message.
+        Params:
+            reading(Reading): One power reading component
+        """
+
+        topic = self.build_topic(reading)
+        payload = self.build_payload(reading)
+        self.publisher.publish(topic, payload)
+
+    def publish_readings(self, readings: list[PowerReading]):
+        """
+        Publishes a list of power readings to MQTT by building the topic and payload for each, 
+        then using the Publisher to send the messages.
+        Params:
+            readings(list[Reading]): A list of power reading components
+        """
+        for reading in readings:
+            self.publish_reading(reading)
