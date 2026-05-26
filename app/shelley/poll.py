@@ -14,10 +14,6 @@ from app.shelley.rpc import (
     parse_rpc_response,
 )
 
-
-
-#ADDRESS = "30:30:F9:EB:DC:EE"
-
 class Poller:
     """
     This class defines the polling logic for continuously fetching status from a Shelly device
@@ -26,7 +22,10 @@ class Poller:
     def __init__(self, config: config.Config):
         self.ADDRESS: str = config.shelley_address
         self.POLL_COUNT: int = 0
-        self.setup_device(self)
+
+    async def start(self):
+        await self.setup_device()
+        await self.poll_forever()
 
     async def send_rpc(self, client: BleakClient, method: str, params: Optional[Dict[str, Any]] = None, request_id: int = 1) -> Dict[str, Any]:
         """Send a single RPC request to the Shelly device over BLE.
@@ -40,6 +39,7 @@ class Poller:
         Returns:
             Parsed Shelly RPC response as a dictionary.
         """
+
         payload = build_rpc_payload(method, params, request_id)
 
         await client.write_gatt_char(
@@ -47,10 +47,13 @@ class Poller:
             pack_length_header(payload),
             response=True,
         )
-        await asyncio.sleep(0.5)
+
+        SLEEP_PERIOD = 0.5
+
+        await asyncio.sleep(SLEEP_PERIOD)
 
         await client.write_gatt_char(RPC_CHAR_DATA_UUID, payload, response=True)
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(SLEEP_PERIOD)
 
         rx_len_raw = await client.read_gatt_char(RPC_CHAR_RX_CTL_UUID)
         rx_len = int.from_bytes(bytes(rx_len_raw[:4]), byteorder="big")
@@ -135,12 +138,14 @@ class Poller:
             200,
         )
 
-        await asyncio.sleep(8)
+        SLEEP_PERIOD = 8
+
+        await asyncio.sleep(SLEEP_PERIOD)
 
         print("\n--- turn relay on ---")
         await self.call(self.ADDRESS, "Switch.Set", {"id": 0, "on": True}, 300)
 
-        await asyncio.sleep(8)
+        await asyncio.sleep(SLEEP_PERIOD)
 
 
     async def poll_forever(
@@ -160,8 +165,8 @@ class Poller:
         """
         print("\n--- read status (polling every 5 seconds indefinitely) ---")
         while True:
-            poll_count += 1
-            print(f"\nPoll {poll_count}:")
+            self.POLL_COUNT += 1
+            print(f"\nPoll {self.POLL_COUNT}:")
             status = await self.call(self.ADDRESS, "Switch.GetStatus", {"id": 0}, 400)
             if callback:
                 await callback(status)
