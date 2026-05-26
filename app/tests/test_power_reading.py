@@ -1,9 +1,9 @@
-from app.models.power_reading import powerReading
+from app.models.power_reading import PowerReading
 
 import pytest
 
 def test_power_reading_sets_attributes():
-    reading = powerReading(
+    reading = PowerReading(
         station_id="station-1",
         building_id="building-1",
         reading_type="power",
@@ -19,7 +19,7 @@ def test_power_reading_sets_attributes():
 
 
 def test_power_reading_str():
-    reading = powerReading(
+    reading = PowerReading(
         station_id="station-1",
         building_id="building-1",
         reading_type="current",
