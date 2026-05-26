@@ -1,4 +1,4 @@
-class powerReading:
+class PowerReading:
     def __init__(self,station_id,building_id,reading_type,value,unit):       
         # Ex. Station where the power reading was captured from
         self.station_id: str = station_id
