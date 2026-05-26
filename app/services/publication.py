@@ -1,3 +1,5 @@
+import json
+
 from app.configuration.config import Config
 from app.models.power_reading import PowerReading
 
@@ -20,5 +22,12 @@ class PublicationService:
         Returns:
             A JSON string with the payload to be published to MQTT.
         """
-
-        return ""
+        # TODO: do we prefer that power reading is a dataclass? 
+        payload = {
+            "station_id": reading.station_id,
+            "building_id": reading.building_id,
+            "reading_type": reading.reading_type,
+            "value": reading.value,
+            "unit": reading.unit
+        }
+        return json.dumps(payload)
