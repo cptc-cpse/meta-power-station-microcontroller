@@ -7,7 +7,8 @@ from app.mqtt.publisher import Publisher
 
 class PublicationService:
     """
-    TODO: nice big docstring here
+    Service responsible for building MQTT topics and payloads from power readings,
+    and using the Publisher to send messages to the MQTT broker.
     
     """
     def __init__(self, config: Config):
