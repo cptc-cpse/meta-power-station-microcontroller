@@ -19,7 +19,6 @@ TEST_MODE = False  # Set to True to test MQTT publishing without Bluetooth polli
 
 publisher : mqtt_publisher.Publisher 
 
-
 def extract_current(status_response: Any) -> Optional[Any]:
     """Extract the current measurement from a Shelly status response.
 
