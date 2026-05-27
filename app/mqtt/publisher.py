@@ -47,19 +47,3 @@ class Publisher:
             if result.rc != mqtt.MQTT_ERR_SUCCESS:
                 logger.error(f"Error publishing MQTT message: {mqtt.error_string(result.rc)}")
             client.disconnect()
-
-#This won't be part of the publisher class, 
-#it will be altered and moved to the publisher service once that's created
-def build_current_payload(current_value: Any) -> str:
-    """Build a compact JSON payload containing the current measurement.
-    TODO: build a payload that matches the expected format for the MQTT topic subscribers.
-    Args:
-        current_value: The current measurement value to include in the payload.
-
-    Returns:
-        A JSON string with a compact current payload.
-    """
-    return json.dumps({"current": current_value}, separators=(",", ":"))
-
-
-

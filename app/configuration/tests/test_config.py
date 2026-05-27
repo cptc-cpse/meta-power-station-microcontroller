@@ -1,5 +1,6 @@
 from app.configuration import config as app_config
 from app.configuration.config import Config
+import pytest
 
 def test_config_has_expected_defaults():
     config = Config()
