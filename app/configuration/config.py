@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 import json
 import logging
 
@@ -54,18 +54,9 @@ class Config:
     @classmethod
     def from_dict(cls, data: dict) -> "Config":
         """Create a Config instance from a dictionary, ignoring any extra fields."""
-        return cls(
-            station_id=data["station_id"],
-            building_id=data["building_id"],
-            mqtt_broker_address=data["mqtt_broker_address"],
-            mqtt_broker_port=data["mqtt_broker_port"],
-            mqtt_qos=data["mqtt_qos"],
-            mqtt_retain=data["mqtt_retain"],
-            shelley_address=data["shelley_address"],
-            reading_types=data["reading_types"],
-            sleep_interval_seconds=data["sleep_interval_seconds"],
-            CONFIG_VERSION=data["CONFIG_VERSION"]
-        )
+        
+        valid_fields = {f.name for f in fields(cls)}
+        return cls(**{key: value for key, value in data.items() if key in valid_fields})
 
 def get_config() -> Config:
     """Retrieves the application configuration.
@@ -80,7 +71,6 @@ def get_config() -> Config:
         with open(CONFIG_PATH, "r") as f:
             config_data = json.load(f)
             config = Config.from_dict(config_data)
-            #print(config_data)
     else:
         logging.warning("No valid configuration found. Creating new configuration.")
         config = create_config()

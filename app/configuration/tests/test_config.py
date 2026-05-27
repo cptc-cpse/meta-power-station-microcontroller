@@ -139,6 +139,13 @@ def test_validation_support_functions_behave_as_expected():
     assert app_config.is_valid_config_version(str(app_config.CURRENT_CONFIG_VERSION)) is True
     assert app_config.is_valid_config_version("invalid config version") is False
 
+def test_get_valid_user_input_returns_valid_input():
+    """Test that the get_valid_user_input function returns valid input when given a prompt and validation function."""
+    user_inputs = ["invalid input", "valid input"]
+    with patch("builtins.input", side_effect=user_inputs):
+        result = app_config.get_valid_user_input("Enter valid input: ", lambda x: x == "valid input")
+        assert result == "valid input"
+
 def test_get_config_returns_config_from_file():
     """Test that the get_config function retrieves a Config object from a file 
     when a valid config file is present."""
