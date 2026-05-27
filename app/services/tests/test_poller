@@ -1,0 +1,29 @@
+import pytest
+from app.configuration.config import Config
+from app.services.poller import PollerService
+
+@pytest.ficture
+def poller_service():
+    """Fixture that provides a PollerService instance."""
+    config = Config()
+    return PollerService(config)
+
+@pytest.mark.asyncio
+async def test_poll_to_readings_happy_path(poller_service):
+    """Test that poll_to_readings successfully polls the Shelly device and extracts readings."""
+    # Act
+    await poller_service.poll_to_readings()
+
+    # Assert
+    # Verify that latest_readings is populated with expected data
+    assert len(poller_service.latest_readings) > 0
+
+@pytest.mark.asyncio
+async def test_extract_readings_happy_path(poller_service):
+    """Test that extract_readings successfully extracts readings from the Poller."""
+    # Act
+    await poller_service.extract_readings()
+
+    # Assert
+    # Verify that latest_readings is populated with expected data
+    assert len(poller_service.latest_readings) > 0

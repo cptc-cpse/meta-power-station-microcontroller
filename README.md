@@ -37,6 +37,7 @@ python -m app.app
 ### Linux / macOS
 
 ### Creating the virtual environment
+
 Create and activate a virtual environment, then install the runtime dependencies:
 
 ```bash
@@ -48,7 +49,7 @@ python -m pip install -r requirements.txt
 
 #### Activating the virtual environment
 
-``` bash
+```bash
 source .venv/bin/activate
 ```
 
@@ -67,5 +68,3 @@ python -m pytest
 ```
 
 If you are running on Windows PowerShell, use the same virtual environment activation commands from the quickstart section before executing tests.
-
-
