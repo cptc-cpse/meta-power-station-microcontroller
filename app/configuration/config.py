@@ -146,7 +146,7 @@ def create_config() -> Config:
     with open(CONFIG_PATH, "w") as f:
         f.write(json_string)
 
-    return Config()
+    return config
 
 def is_valid_config() -> bool:
     """Checks if the existing configuration file is valid.
