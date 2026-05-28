@@ -14,6 +14,7 @@ class ApplicationService:
     async def run_forever(self):
         """Run the application indefinitely, polling for readings and publishing them."""
         await self.poller_service.poller.setup_device()
+        print(f"\n--- read status (polling every {self.SLEEP_INTERVAL_SECONDS} seconds indefinitely) ---")
         while True:
             readings = await self.poller_service.poll_to_readings()
             self.publication_service.publish_readings(readings)

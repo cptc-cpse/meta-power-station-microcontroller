@@ -57,6 +57,7 @@ class PublicationService:
         topic = self.build_topic(reading)
         payload = self.build_payload(reading)
         self.publisher.publish(topic, payload)
+        print(f"Published to {topic}: {payload}")
 
     def publish_readings(self, readings: list[PowerReading]):
         """
