@@ -19,7 +19,7 @@ POLLING_INTERVAL_SECONDS : int = 10
 TOPIC = "clover_park/building_24/meta_power_station/station_alpha/current"
 
 TEST_MODE = False  # Set to True to test MQTT publishing without Bluetooth polling
-TEST_POLL_MODE = True
+TEST_POLL_MODE = False  # Set to True to test polling
 publisher : mqtt_publisher.Publisher 
 
 def extract_current(status_response: Any) -> Optional[Any]:
