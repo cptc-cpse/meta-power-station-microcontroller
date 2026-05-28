@@ -5,6 +5,9 @@ from app.shelley import poll as shelly_poll
 from app.mqtt import publisher as mqtt_publisher
 from app.configuration import config as app_config
 
+# Services
+from app.services.poller import PollerService
+
 """
 This module serves as the main entry point for the application, orchestrating the BLE communication
 with the Shelly device and the MQTT publishing of current measurements.
@@ -16,7 +19,7 @@ POLLING_INTERVAL_SECONDS : int = 10
 TOPIC = "clover_park/building_24/meta_power_station/station_alpha/current"
 
 TEST_MODE = False  # Set to True to test MQTT publishing without Bluetooth polling
-
+TEST_POLL_MODE = True
 publisher : mqtt_publisher.Publisher 
 
 def extract_current(status_response: Any) -> Optional[Any]:
@@ -72,7 +75,14 @@ async def main() -> None:
     """Set up the Shelly device and begin polling its status indefinitely."""
     config = app_config.get_config()
     publisher = mqtt_publisher.Publisher(config)
-    if TEST_MODE:
+    poller_service_instance = PollerService(config)
+    if TEST_POLL_MODE:
+        print("Running in TEST_POLL_MODE: Polling Shelly device once and publishing status")
+        while True:
+            readings = await poller_service_instance.extract_readings()
+            print(f"Extracted Shelly Readings: {readings}")
+            await asyncio.sleep(POLLING_INTERVAL_SECONDS)
+    elif TEST_MODE:
         # Test mode: periodically publish a test payload to MQTT without Bluetooth polling
         print("Running in TEST_MODE: Publishing test payload every", POLLING_INTERVAL_SECONDS, "seconds")
         while True:
@@ -82,7 +92,7 @@ async def main() -> None:
             print(f"Test published to {TOPIC}: {payload}")
             await asyncio.sleep(POLLING_INTERVAL_SECONDS)
     else:
-        # Normal mode: Poll Shelly device and publish status
+        # Normal mode: Poll Shelly device and publish status'
         await shelly_poll.setup_device()
         await shelly_poll.poll_forever(interval=POLLING_INTERVAL_SECONDS, callback=publish_status)
 

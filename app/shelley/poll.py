@@ -171,3 +171,11 @@ class Poller:
             if callback:
                 await callback(status)
             await asyncio.sleep(interval)
+
+    async def poll(self) -> Dict[str, Any]:
+        """Poll the Shelly device for its current status.
+
+        Returns:
+            The Shelly status response dictionary.
+        """
+        return await self.get_status()

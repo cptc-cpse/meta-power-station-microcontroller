@@ -2,7 +2,7 @@ import pytest
 from app.configuration.config import Config
 from app.services.poller import PollerService
 
-@pytest.ficture
+@pytest.fixture
 def poller_service():
     """Fixture that provides a PollerService instance."""
     config = Config()

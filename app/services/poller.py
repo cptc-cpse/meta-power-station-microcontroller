@@ -1,5 +1,9 @@
-from app.configuration.config import Config
+from typing import Any, Optional
+
 from app.shelley.poll import Poller
+from app.configuration.config import Config
+from app.models.power_reading import PowerReading
+
 
 class PollerService:
     """
@@ -13,17 +17,39 @@ class PollerService:
         self.BUILDING_ID = config.building_id
         self.latest_readings = []
 
-    async def poll_to_readings(self):
+    def poll_to_readings(self):
         """
-        Polls the Shelly device and converts the readings into a structured format.
+        Poll_to_readings should return the latest readings
         """
-        await self.poller.start()
-        await self.extract_readings()
+        print("Latest readings:", self.latest_readings)
+        return self.latest_readings
 
     async def extract_readings(self):
         """
-        Extracts the latest readings from the Poller and stores them in the latest_readings list.
+        Extract_readings() should take in a status as a parameter, 
+        and using the data from that and the configured variables, 
+        create a PowerReading. If the poll() method returns the status, 
+        then we could just have extract_readings() return the readings 
+        for poll_to_readings() to use more directly, rather than setting
+        latest_readings.
         """
-        # Assuming the Poller has a method to get the latest readings
-        self.latest_readings = await self.poller.get_latest_readings()   
+
+        status = await self.poller.poll()
+
+        if status is not None:
+            reading = PowerReading(
+                reading_type=status.get("reading_type", "current"),
+                unit=status.get("unit", "amp"),
+                value=status.get("value", 0.0),
+            )
+            self.latest_readings.append(reading)
+            return self.poll_to_readings()
+        else:
+            print("No status received from Shelly device during polling.")
+
+    
+
+
+    
+
 
