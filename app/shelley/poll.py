@@ -23,10 +23,6 @@ class Poller:
         self.ADDRESS: str = config.shelley_address
         self.POLL_COUNT: int = 0
 
-    async def start(self):
-        await self.setup_device()
-        await self.poll_forever()
-
     async def send_rpc(self, client: BleakClient, method: str, params: Optional[Dict[str, Any]] = None, request_id: int = 1) -> Dict[str, Any]:
         """Send a single RPC request to the Shelly device over BLE.
 

@@ -20,13 +20,11 @@ async def main() -> None:
     config = app_config.get_config()
     application_service = ApplicationService(config)
     if TEST_MODE == 2:
-        print("Running in TEST_POLL_MODE: Polling Shelly device once and publishing status")
-        while True:
-            print(f"Extracted Shelly Readings: ")
+        # Test mode: periodically poll the Shelly device and print the extracted readings without publishing to MQTT
+        await application_service.test_polling()
     elif TEST_MODE == 1:
         # Test mode: periodically publish a test payload to MQTT without Bluetooth polling
-        print("Running in TEST_MODE: Publishing test payload every  seconds")
-        
+        await application_service.test_publishing()   
     else:
         # Normal mode: Poll Shelly device and publish status'
         await application_service.run_forever()
