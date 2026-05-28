@@ -178,4 +178,6 @@ class Poller:
         Returns:
             The Shelly status response dictionary.
         """
+        self.POLL_COUNT += 1
+        print(f"\nPoll {self.POLL_COUNT}:")
         return await self.get_status()

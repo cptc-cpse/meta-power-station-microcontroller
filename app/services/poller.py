@@ -3,6 +3,7 @@ from typing import Any, Optional
 from app.shelley.poll import Poller
 from app.configuration.config import Config
 from app.models.power_reading import PowerReading
+import logging
 
 
 class PollerService:
@@ -15,37 +16,45 @@ class PollerService:
         self.READING_TYPES = config.reading_types
         self.STATION_ID = config.station_id
         self.BUILDING_ID = config.building_id
-        self.latest_readings = []
 
-    def poll_to_readings(self):
+    async def poll_to_readings(self) -> list[PowerReading]:
         """
-        Poll_to_readings should return the latest readings
-        """
-        print("Latest readings:", self.latest_readings)
-        return self.latest_readings
+        Poll the Shelly device for status and extract power readings as a list of PowerReading objects.
 
-    async def extract_readings(self):
+        Returns:
+            A list of PowerReading objects extracted from the Shelly status response.
         """
-        Extract_readings() should take in a status as a parameter, 
-        and using the data from that and the configured variables, 
-        create a PowerReading. If the poll() method returns the status, 
-        then we could just have extract_readings() return the readings 
-        for poll_to_readings() to use more directly, rather than setting
-        latest_readings.
-        """
-
         status = await self.poller.poll()
+        return self.extract_readings(status)
 
-        if status is not None:
-            reading = PowerReading(
-                reading_type=status.get("reading_type", "current"),
-                unit=status.get("unit", "amp"),
-                value=status.get("value", 0.0),
-            )
-            self.latest_readings.append(reading)
-            return self.poll_to_readings()
+    def extract_readings(self, status: dict) -> list[PowerReading]:
+        """
+        Extract readings from the Shelly status response and return them as a list of PowerReading objects.
+        
+        Params:
+            status: The Shelly status response dictionary.
+        
+        Returns:
+            A list of PowerReading objects extracted from the status response.
+        """
+
+        readings = []
+        result = status.get("result", status)
+        if isinstance(result, dict):
+            for reading_type, unit in self.READING_TYPES.items():
+                value = result.get(reading_type)
+                if value is not None:
+                    reading = PowerReading(
+                        station_id=self.STATION_ID,
+                        building_id=self.BUILDING_ID,
+                        reading_type=reading_type,
+                        unit=unit,
+                        value=value
+                    )
+                    readings.append(reading)
         else:
-            print("No status received from Shelly device during polling.")
+            logging.warning("Unexpected status format: 'result' is not a dict.")
+        return readings
 
     
 
