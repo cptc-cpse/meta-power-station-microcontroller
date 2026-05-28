@@ -6,7 +6,7 @@ import pytest
 @pytest.fixture
 def config():
     """Fixture that provides a Config instance."""
-    return app_config.get_config()
+    return app_config.Config()
 
 def test_publisher_initializes_with_config(config):
     publisher = mqtt_publisher.Publisher(config)
