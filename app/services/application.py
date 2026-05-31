@@ -23,15 +23,17 @@ class ApplicationService:
     async def test_publishing(self):
         """Test method to publish sample readings without polling."""
         print("Running in TEST_PUBLISH_MODE: Publishing test payload every", self.SLEEP_INTERVAL_SECONDS, "seconds")
+        counter = 0
         while True:
             test_reading = PowerReading(
                 station_id="test_station",
                 building_id="test_building",
                 reading_type="current",
                 unit="amps",
-                value=5.0
+                value=counter
             )
             self.publication_service.publish_reading(test_reading)
+            counter += 1
             await asyncio.sleep(self.SLEEP_INTERVAL_SECONDS)
 
     async def test_polling(self):
