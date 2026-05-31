@@ -16,9 +16,9 @@ so we'd have to treat them special cases if we wanted to extract them.
 #Valid reading types that can be polled from the Shelly status response, mapped to their expected units
 VALID_READING_TYPES = { 
     "current": "amps",
-    "apower": "watts",
+    "apower": "watts", #power
     "voltage": "volts",
-    "frequency": "hertz"
+    "freq": "hertz" #frequency
 }
 
 @dataclass
@@ -45,7 +45,7 @@ class Config:
     #The types of readings to extract from the Shelly status response, mapped to their units
     reading_types: dict[str, str] =  field(default_factory=lambda: {"current": "amps", "apower": "watts", "voltage": "volts"})
     #The interval in seconds between each loop of polling the Shelly device and publishing to MQTT
-    sleep_interval_seconds: int = 10
+    sleep_interval_seconds: float = 5.0
     #The version of the configuration schema, used for validating and migrating configurations
     #Not set by the user, we will increment this when we make breaking changes to the 
     #configuration structure to trigger re-creation of the config file
@@ -109,7 +109,7 @@ def create_config() -> Config:
     config.shelley_address = get_valid_user_input(prompt, is_valid_shelley_address)
 
     prompt = f"Sleep Interval Seconds (default: {config.sleep_interval_seconds}): "
-    config.sleep_interval_seconds = int(get_valid_user_input(prompt, is_valid_sleep_interval, str(config.sleep_interval_seconds)))
+    config.sleep_interval_seconds = float(get_valid_user_input(prompt, is_valid_sleep_interval, str(config.sleep_interval_seconds)))
 
     user_input = -1
     print("""For reading types, you will select which of the following readings types you want to use.
@@ -323,7 +323,7 @@ def is_valid_sleep_interval(interval: str) -> bool:
     Returns:
         bool: True if the sleep interval is valid, False otherwise.
     """
-    if interval.isdigit() and int(interval) >= 1:
+    if interval.isdigit() and float(interval) > 0:
         return True
     return False
 
