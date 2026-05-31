@@ -10,10 +10,10 @@ from app.services.application import ApplicationService
 This module serves as the main entry point for the application, orchestrating the BLE communication
 with the Shelly device and the MQTT publishing of current measurements.
 """
-
+# Set to 0 for normal operation.
 # Set to 1 to test MQTT publishing without Bluetooth polling,
-# or set to 2 to test Bluetooth polling without MQTT publishing. Set to 0 for normal operation.
-TEST_MODE = 0   
+# or set to 2 to test Bluetooth polling without MQTT publishing. 
+TEST_MODE = 0
 
 async def main() -> None:
     """Set up the Shelly device and begin polling its status indefinitely."""

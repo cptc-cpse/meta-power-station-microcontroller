@@ -112,12 +112,12 @@ def create_config() -> Config:
     config.sleep_interval_seconds = float(get_valid_user_input(prompt, is_valid_sleep_interval, str(config.sleep_interval_seconds)))
 
     user_input = -1
-    print("""For reading types, you will select which of the following readings types you want to use.
-            If you select a reading type that is already selected, it will be removed. 
-            Press Enter without typing anything to finish selecting.""")
+    print("For reading types, you will select which of the following readings types you want to use.\n",
+            "If you select a reading type that is already selected, it will be removed.\n", 
+            "Press Enter without typing anything to finish selecting.")
     while user_input or not config.reading_types: 
-        prompt = f"""Currently selected reading types: {list(config.reading_types.keys())}. 
-        Enter a reading type to add or remove (options: {list(VALID_READING_TYPES.keys())}): """
+        prompt = (f"Currently selected reading types: {list(config.reading_types.keys())}.\n",
+        "Enter a reading type to add or remove (options: {list(VALID_READING_TYPES.keys())}): ")
         user_input = input(prompt).strip()
         if user_input in VALID_READING_TYPES.keys():
             if user_input in config.reading_types:
@@ -323,9 +323,13 @@ def is_valid_sleep_interval(interval: str) -> bool:
     Returns:
         bool: True if the sleep interval is valid, False otherwise.
     """
-    if interval.isdigit() and float(interval) > 0:
-        return True
-    return False
+    try: 
+        if float(interval) > 0:
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
 
 def is_valid_config_version(version: str) -> bool:
     """Validates the configuration version input by the user. 
