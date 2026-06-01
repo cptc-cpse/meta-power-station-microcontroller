@@ -16,9 +16,9 @@ so we'd have to treat them special cases if we wanted to extract them.
 #Valid reading types that can be polled from the Shelly status response, mapped to their expected units
 VALID_READING_TYPES = { 
     "current": "amps",
-    "apower": "watts",
+    "apower": "watts", #power
     "voltage": "volts",
-    "frequency": "hertz"
+    "freq": "hertz" #frequency
 }
 
 @dataclass
@@ -45,7 +45,7 @@ class Config:
     #The types of readings to extract from the Shelly status response, mapped to their units
     reading_types: dict[str, str] =  field(default_factory=lambda: {"current": "amps", "apower": "watts", "voltage": "volts"})
     #The interval in seconds between each loop of polling the Shelly device and publishing to MQTT
-    sleep_interval_seconds: int = 10
+    sleep_interval_seconds: float = 5.0
     #The version of the configuration schema, used for validating and migrating configurations
     #Not set by the user, we will increment this when we make breaking changes to the 
     #configuration structure to trigger re-creation of the config file
@@ -74,6 +74,8 @@ def get_config() -> Config:
     else:
         logging.warning("No valid configuration found. Creating new configuration.")
         config = create_config()
+    print("Current Configuration: ")
+    print(json.dumps(config.__dict__, indent=4))
     return config
 
 def create_config() -> Config:
@@ -109,15 +111,15 @@ def create_config() -> Config:
     config.shelley_address = get_valid_user_input(prompt, is_valid_shelley_address)
 
     prompt = f"Sleep Interval Seconds (default: {config.sleep_interval_seconds}): "
-    config.sleep_interval_seconds = int(get_valid_user_input(prompt, is_valid_sleep_interval, str(config.sleep_interval_seconds)))
+    config.sleep_interval_seconds = float(get_valid_user_input(prompt, is_valid_sleep_interval, str(config.sleep_interval_seconds)))
 
     user_input = -1
-    print("""For reading types, you will select which of the following readings types you want to use.
-            If you select a reading type that is already selected, it will be removed. 
-            Press Enter without typing anything to finish selecting.""")
+    print("For reading types, you will select which of the following readings types you want to use.\n",
+            "If you select a reading type that is already selected, it will be removed.\n", 
+            "Press Enter without typing anything to finish selecting.")
     while user_input or not config.reading_types: 
-        prompt = f"""Currently selected reading types: {list(config.reading_types.keys())}. 
-        Enter a reading type to add or remove (options: {list(VALID_READING_TYPES.keys())}): """
+        prompt = (f"Currently selected reading types: {list(config.reading_types.keys())}.\n",
+        "Enter a reading type to add or remove (options: {list(VALID_READING_TYPES.keys())}): ")
         user_input = input(prompt).strip()
         if user_input in VALID_READING_TYPES.keys():
             if user_input in config.reading_types:
@@ -323,9 +325,13 @@ def is_valid_sleep_interval(interval: str) -> bool:
     Returns:
         bool: True if the sleep interval is valid, False otherwise.
     """
-    if interval.isdigit() and int(interval) >= 1:
-        return True
-    return False
+    try: 
+        if float(interval) > 0:
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
 
 def is_valid_config_version(version: str) -> bool:
     """Validates the configuration version input by the user. 

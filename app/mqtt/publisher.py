@@ -43,7 +43,7 @@ class Publisher:
             logger.error(f"Error connecting to MQTT broker: {e}")
         else: 
             result = client.publish(topic, payload, qos=self.QOS, retain=self.RETAIN)
-            result.wait_for_publish(3)  # Wait for the publish to complete
+            result.wait_for_publish(.5)  # Wait for the publish to complete
             if result.rc != mqtt.MQTT_ERR_SUCCESS:
                 logger.error(f"Error publishing MQTT message: {mqtt.error_string(result.rc)}")
             client.disconnect()
