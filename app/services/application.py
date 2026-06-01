@@ -20,26 +20,3 @@ class ApplicationService:
             self.publication_service.publish_readings(readings)
             await asyncio.sleep(self.SLEEP_INTERVAL_SECONDS)
 
-    async def test_publishing(self):
-        """Test method to publish sample readings without polling."""
-        print("Running in TEST_PUBLISH_MODE: Publishing test payload every", self.SLEEP_INTERVAL_SECONDS, "seconds")
-        counter = 0
-        while True:
-            test_reading = PowerReading(
-                station_id="test_station",
-                building_id="test_building",
-                reading_type="current",
-                unit="amps",
-                value=counter
-            )
-            self.publication_service.publish_reading(test_reading)
-            counter += 1
-            await asyncio.sleep(self.SLEEP_INTERVAL_SECONDS)
-
-    async def test_polling(self):
-        """Test method to poll the Shelly device and print the extracted readings."""
-        print("Running in TEST_POLL_MODE: Polling Shelly device every", self.SLEEP_INTERVAL_SECONDS, "seconds and printing extracted readings")
-        while True:
-            readings = await self.poller_service.poll_to_readings()
-            print(f"Extracted Shelly Readings: {readings}")
-            await asyncio.sleep(self.SLEEP_INTERVAL_SECONDS)

@@ -74,6 +74,8 @@ def get_config() -> Config:
     else:
         logging.warning("No valid configuration found. Creating new configuration.")
         config = create_config()
+    print("Current Configuration: ")
+    print(json.dumps(config.__dict__, indent=4))
     return config
 
 def create_config() -> Config:
