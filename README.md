@@ -63,7 +63,7 @@ python -m app.app
 
 On intial setup, enter corrosponding values that will be saved into the config file:
 
-- Building ID (Format: 'station_<name>')
+- Building ID (Format: 'station_\<name\>')
 - MQTT Broker Address (default: 192.168.1.115)
 - Broker Port (default: 1883)
 - Quality of Service level (0, 1, or 2; default: 1)
@@ -88,3 +88,15 @@ python -m pytest
 ```
 
 If you are running on Windows PowerShell, use the same virtual environment activation commands from the quickstart section before executing tests.
+
+## Running in test mode
+
+The test_mode module is for testing code locally without a shelley device or MQTT publishing
+
+To run the code in test mode, enter this command:
+
+```
+python -m app.test_mode
+```
+
+Then respond to the prompts dependant on how you want to test the code.
