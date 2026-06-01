@@ -59,12 +59,48 @@ Run the app with:
 python -m app.app
 ```
 
+#### Configuration
+
+On intial setup, enter corrosponding values that will be saved into the config file:
+
+- Building ID (Format: 'station_\<name\>')
+- MQTT Broker Address (default: 192.168.1.115)
+- Broker Port (default: 1883)
+- Quality of Service level (0, 1, or 2; default: 1)
+- MQTT Retain Flag (true or false; default: false)
+- Shelley Device Address (no default, Bluetooth MAC Address, example: {config.shelley_address})
+- Sleep Interval Seconds (default: 5 seconds)
+
+After initial creation, you can update the device's config by editing the created file itself. Do this by using this command
+
+```
+cd <config filepath>
+sudo nano config.py
+```
+
 ## Running unit tests
 
 Run all unit tests in the repository with pytest from the project root:
+
 
 ```bash
 python -m pytest
 ```
 
 If you are running on Windows PowerShell, use the same virtual environment activation commands from the quickstart section before executing tests.
+
+## Running in test mode
+
+The test_mode module is for testing code locally without a shelley device or MQTT publishing
+
+To run the code in test mode, enter this command:
+
+```
+python -m app.test_mode
+```
+
+The console will then prompt you to enter a value depending on how you want to test the code and the only accepted inputs are either 1 or 2.
+
+Entering 1 will allow you to test **publishing without bluetooth polling** which is useful due to not having to setup a shelley device.
+
+Entering 2 will allow you to test **polling a shelley device without MQTT publishing** to ensure the shelley is operating as intended.
