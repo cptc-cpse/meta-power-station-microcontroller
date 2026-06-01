@@ -5,7 +5,7 @@ from app.models.power_reading import PowerReading
 from app.services.poller import PollerService
 from app.services.publication import PublicationService
 
-async def main():
+async def test():
     config = app_config.get_config()
     global SLEEP_INTERVAL_SECONDS, poller_service, publication_service
     SLEEP_INTERVAL_SECONDS = config.sleep_interval_seconds
@@ -51,4 +51,4 @@ async def test_polling():
         await asyncio.sleep(SLEEP_INTERVAL_SECONDS)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(test())
