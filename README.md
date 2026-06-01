@@ -99,4 +99,8 @@ To run the code in test mode, enter this command:
 python -m app.test_mode
 ```
 
-Then respond to the prompts dependant on how you want to test the code.
+The console will then prompt you to enter a value depending on how you want to test the code and the only accepted inputs are either 1 or 2.
+
+Entering 1 will allow you to test **publishing without bluetooth polling** which is useful due to not having to setup a shelley device.
+
+Entering 2 will allow you to test **polling a shelley device without MQTT publishing** to ensure the shelley is operating as intended.
