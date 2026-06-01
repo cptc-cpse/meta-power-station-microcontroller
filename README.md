@@ -59,9 +59,29 @@ Run the app with:
 python -m app.app
 ```
 
+#### Configuration
+
+On intial setup, enter corrosponding values that will be saved into the config file:
+
+- Building ID (Format: 'station_<name>')
+- MQTT Broker Address (default: 192.168.1.115)
+- Broker Port (default: 1883)
+- Quality of Service level (0, 1, or 2; default: 1)
+- MQTT Retain Flag (true or false; default: false)
+- Shelley Device Address (no default, Bluetooth MAC Address, example: {config.shelley_address})
+- Sleep Interval Seconds (default: 5 seconds)
+
+After initial creation, you can update the device's config by editing the created file itself. Do this by using this command
+
+```
+cd <config filepath>
+sudo nano config.py
+```
+
 ## Running unit tests
 
 Run all unit tests in the repository with pytest from the project root:
+
 
 ```bash
 python -m pytest
