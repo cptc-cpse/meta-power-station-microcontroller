@@ -24,15 +24,7 @@ class PublicationService:
         Returns:
             A JSON string with the payload to be published to MQTT.
         """
-        # TODO: do we prefer that power reading is a dataclass? 
-        payload = {
-            "station_id": reading.station_id,
-            "building_id": reading.building_id,
-            "reading_type": reading.reading_type,
-            "value": reading.value,
-            "unit": reading.unit
-        }
-        return json.dumps(payload)
+        return json.dumps(reading.__dict__)
     
     def build_topic(self, reading: PowerReading) -> str:
         """
